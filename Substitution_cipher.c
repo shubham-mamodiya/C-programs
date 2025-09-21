@@ -2,8 +2,8 @@
  * File: substitution_cipher.c
  * Author: Shubham Mamodiya
  * Description:
- *    This program an implementation of encryption algorithm to cypher Text with
- * a unique key.
+ *    This program is an implementation of encryption algorithm to cypher Text
+ * with a unique key.
  */
 #include <cs50.h>
 #include <ctype.h>
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     return ERR_INVALID_INPUT;
   }
 
-  char *key = argv[2];
+  char *key = argv[1];
   int key_len = strlen(key);
 
   // checking length
@@ -69,13 +69,13 @@ void substitution_cipher(char *plain_text, char *key, int len_plain_text,
     char ch = plain_text[idx];
     int ch_hash = char_hash(ch);
 
-    if (ch_hash == 0) { // ch is not alphabetical
+    if (ch_hash == -1) { // ch is not alphabetical
       cipher_text[idx] = plain_text[idx];
       continue;
     } else if (isupper(plain_text[idx])) {
-      cipher_text[idx] = toupper(key[idx]);
+      cipher_text[idx] = toupper(key[ch_hash]);
     } else {
-      cipher_text[idx] = key[idx];
+      cipher_text[idx] = key[ch_hash];
     }
   }
   cipher_text[len_plain_text] = '\0';
@@ -83,9 +83,10 @@ void substitution_cipher(char *plain_text, char *key, int len_plain_text,
 
 int char_hash(char ch) {
   if (isupper(ch)) {
-    return (-1 * ('A' - ch));
+    return (ch - 'A');
   } else if (islower(ch)) {
-    return (-1 * ('a' - ch));
+    return (ch - 'a');
   }
-  return 0;
+  int not_apha = -1;
+  return not_apha;
 }
