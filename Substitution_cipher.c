@@ -1,3 +1,10 @@
+/*
+ * File: substitution_cipher.c
+ * Author: Shubham Mamodiya
+ * Description:
+ *    This program an implementation of encryption algorithm to cypher Text with
+ * a unique key.
+ */
 #include <cs50.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -50,6 +57,14 @@ int main(int argc, char *argv[]) {
 
 void substitution_cipher(char *plain_text, char *key, int len_plain_text,
                          char *cipher_text) {
+  /*
+   * cipher's the Plain Text with key and stores it in cipher_text pointer
+   * location cipher_text buffer should be same or more in length of plain text
+   * String plain text
+   * char key[26]
+   * int length of plain text
+   * pointer cipher_text[length]
+   */
   for (int idx = 0; idx < len_plain_text; idx++) {
     char ch = plain_text[idx];
     int ch_hash = char_hash(ch);
