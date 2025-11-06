@@ -77,3 +77,89 @@ error:
     perror("File error");
     return 1;
 }
+
+/************* ARRAY BASICS *************/
+int arr[5];           // array of 5 ints
+arr[i];               // element i
+*arr;                 // same as arr[0]
+*(arr + i);           // same as arr[i]
+&arr[i];              // address of element i
+
+/************* ARRAY DECAYS TO POINTER *************/
+int *p = arr;         // arr becomes pointer to first element
+p[2];                 // valid, same as arr[2]
+
+/************* PASSING ARRAY TO FUNCTION *************/
+void fun(int arr[], int size);   // equivalent to:
+void fun(int *arr, int size);    // arr becomes pointer
+
+fun(arr, 5);          // ✅ call — no brackets
+
+void fun(int arr[], int size) {
+    arr[0] = 10;       // valid (modifies original array)
+}
+
+/************* SIZE OF ARRAY *************/
+int a[10];
+int size = sizeof(a) / sizeof(a[0]);   // ✅ works here
+
+void fun2(int arr[]) {
+    sizeof(arr);      // ❌ arr is pointer here, NOT full array
+}
+
+/************* POINTER VS ARRAY *************/
+int *p = arr;         // pointer to first element
+p++;                 // ✅ pointer moves to next element
+arr++;               // ❌ invalid, arrays can't move
+
+/************* DYNAMIC ARRAY *************/
+int *d = malloc(n * sizeof(int));
+fun(d, n);
+
+/************* FIXED-SIZE ARRAY IN FUNCTION *************/
+void fun3(int (*arr)[10]) {   // array must be size 10
+    (*arr)[3] = 100;
+}
+
+int a2[10];
+fun3(&a2);
+
+
+
+////////////////////////////////////////////////////////////////*
+  //   !num means is num == 0
+  // num in a condition means asking is num != 0
+  // a boolien function returns 1 for True 
+  // and 0 for false 
+  // non boolien function return 0 for success or say true 
+  // non zero for error or say false 
+    /*
+       HOW IF STATEMENTS WORK IN C
+       -----------------------------
+       if (something)  → runs when "something" is TRUE
+
+       TRUE in C  = any non-zero value
+       FALSE in C = zero (0)
+
+       So these are true:
+            if (5)
+            if (-7)
+            if (100)
+
+       And these are false:
+            if (0)
+            if (false)
+    */
+
+  /*
+  SUMMARY
+  ----------------------------------------------------
+  - C treats 0 as false, anything else as true
+  - if (value) runs when value is true (non-zero)
+  - if (!value) runs when value is false (zero)
+  - return true;  means return 1
+  - return false; means return 0
+  - && = AND
+  - || = OR
+  - !  = NOT
+*/
