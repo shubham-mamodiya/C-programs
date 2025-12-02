@@ -41,38 +41,40 @@ struct Cell {
  *
  */
 
-void initialize(short size, struct Cell arr[][size]);
-void print_Grid(short size, struct Cell arr[][size]);
+void initialize(unsigned long size, struct Cell arr[][size]);
+void print_Grid(unsigned long size,
+                struct Cell arr[][size]); // For small training set
 
 int main(int argc, char *argv[]) {
   srand(time(NULL));
 
-  short n = 0;
-  printf("Size of the Experiment upto 4000 possible: ");
-  scanf("%hd", &n);
-  if (n <= 0) {
+  unsigned long size = 0;
+  printf(
+      "Size of the Experiment(0 to ~1.84e19 if computation is avialable): "); // NOTE: no more then 20000 for my 11 GB free memory
+  scanf("%ld", &size);
+  if (size <= 0) {
     printf("\n ---Invalid size---\n");
     return 1;
-  } else if (n > 4000) {
-    printf("Size greater then 4000 will generate Segmentation fault due to "
-           "Stack Overflow.\n Every average linux distibution have about 8MB "
-           "for Stack.\n This program is not ment to run any experiments "
-           "bigger then 4000 in size.");
-    return 2;
-    ;
   }
-  struct Cell grid[n][n];
-  initialize(n, grid);
 
-  print_Grid(n, grid);
+  struct Cell(*grid)[size] =
+      malloc(size * sizeof *grid); // 2D array of Cell structure
+  if (!grid) {
+    printf("Grid is not available, issue with malloc.");
+    return 5;
+  }
+  initialize(size, grid);
+  // print_Grid(size, grid);
 
+  free(grid);
   return 0;
 }
 
 // Make each Cell connected to itself and Closed or blocked
-void initialize(short size, struct Cell arr[][size]) {
-  if (size < 0) {
+void initialize(unsigned long size, struct Cell arr[][size]) {
+  if (size <= 0) {
     exit(3);
+    free(arr);
   }
   for (int i = 0; i < size; i++) {
     for (int j = 0; j < size; j++) {
@@ -84,8 +86,9 @@ void initialize(short size, struct Cell arr[][size]) {
   }
 }
 
-void print_Grid(short size, struct Cell arr[][size]) {
-  if (size < 0) {
+void print_Grid(unsigned long size, struct Cell arr[][size]) {
+  if (size <= 0) {
+    free(arr);
     exit(4);
   }
   for (int i = 0; i < size; i++) {
@@ -100,6 +103,25 @@ void print_Grid(short size, struct Cell arr[][size]) {
   }
 }
 
-void randomized_Connections(short size, struct Cell grid[size][size]) {}
+void state_Grid(unsigned long size, struct Cell arr[][size]) {
+  if (size <= 0) {
+    free(arr);
+    exit(6);
+  }
+  for (unsigned int row = 0; row < size; row++) {
+    for (unsigned int column = 0; column < size; column++) {
+    }
+  }
+}
 
-// void psudo_Random_Generator(int size, int)
+void get_Neighbours_State(unsigned long row, unsigned long column,
+                          unsigned long size, struct Cell arr[][size]) {
+  if (row >= size || column >= size) {
+    free(arr);
+    exit(7);
+  }
+
+  // Because index 0, 0 can't have Cell upside and left
+  if (row == column == 0) {
+  }
+}
