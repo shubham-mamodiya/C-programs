@@ -128,7 +128,7 @@ void state_Grid(unsigned long size, struct Cell arr[][size]) {
 
 void get_Neighbors_State(unsigned long row, unsigned long column,
                          unsigned long size, struct Cell arr[][size]) {
-  if (size <= 0 || row >= size || column >= size) {
+  if (size <= 0 || row >= size || column >= size || row < 0 || column < 0) {
     free(arr);
     exit(7);
   }
