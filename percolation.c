@@ -18,6 +18,7 @@ uint8_t down_bit_index = 1U;
 uint8_t Right_bit_index = 0U;
 
 #define BITVALUE(X, N) (((X) >> (N)) & 1U)
+
 #define SETBIT(X, N) ((X) |= (1U << N))
 
 struct Root {
@@ -29,12 +30,14 @@ struct Cell {
   uint8_t meta_data; // 00011111, 000 just extra and unused bits.
   // 000<This><Left><Up><Down><Right> cells are open.
   // Any field will be 0 if that cell is not open or does not exists.
-  //
-  // bit4: OPEN
-  // bit3: LEFT
-  // bit2: UP
-  // bit1: DOWN
-  // bit0: RIGHT
+
+  /* bit4: OPEN
+   * bit3: LEFT
+   * bit2: UP
+   * bit1: DOWN
+   * bit0: RIGHT
+   */
+
   struct Root root;
   int size; // Number of connected Cells
 };
@@ -55,8 +58,8 @@ int main(int argc, char *argv[]) {
   srand(time(NULL));
 
   unsigned long size = 0;
-  printf(
-      "Size of the Experiment(0 to ~1.84e19 if computation is avialable): "); // NOTE: no more then 20000 for my 11 GB free memory
+  printf("Size of the Experiment(0 to ~1.84e19 if computation is "
+         "avialable): "); // NOTE: no more then 20000 for my 11 GB free memory
   scanf("%ld", &size);
 
   if (size <= 0) {
@@ -123,18 +126,21 @@ void state_Grid(unsigned long size, struct Cell arr[][size]) {
   }
 }
 
-void get_Neighbours_State(unsigned long row, unsigned long column,
-                          unsigned long size, struct Cell arr[][size]) {
-  if (size <= 0 || row >= size || column >= size || row < 0 || column < 0) {
+void get_Neighbors_State(unsigned long row, unsigned long column,
+                         unsigned long size, struct Cell arr[][size]) {
+  if (size <= 0 || row >= size || column >= size) {
     free(arr);
     exit(7);
   }
 
-  // bit4: OPEN
-  // bit3: LEFT
-  // bit2: UP
-  // bit1: DOWN
-  // bit0: RIGHT
+  /* bit4: OPEN
+   * bit3: LEFT
+   * bit2: UP
+   * bit1: DOWN
+   * bit0: RIGHT
+   */
+
+  /* corner case */
 
   // upper left corner at index [0][0]
   // Because index 0, 0 can't have Cell above and left
@@ -146,11 +152,12 @@ void get_Neighbours_State(unsigned long row, unsigned long column,
     }
     if (row + 1 < size) {
       if (BITVALUE(arr[row + 1][column].meta_data,
-                   4)) // 4th bit Cell to the below
+                   4)) // 4th bit Cell below
         SETBIT(arr[row][column].meta_data, 1);
     }
   }
   // lower left corner at the index [size - 1][0]
+  // not available Cells are down & left
   else if (row == size - 1 && column == 0) {
 
     if (column + 1 < size) {
@@ -161,8 +168,122 @@ void get_Neighbours_State(unsigned long row, unsigned long column,
 
     if (row - 1 >= 0) {
       if (BITVALUE(arr[row - 1][column].meta_data,
-                   4)) // 4th bit Cell to the above
+                   4)) // 4th bit Cell above
         SETBIT(arr[row][column].meta_data, 2);
     }
+  }
+  // upper right corner at index [0][size - 1]
+  // not available Cells above & right
+  else if (row == 0 && column == (size - 1)) {
+    if (column - 1 >= 0) {
+      if (BITVALUE(arr[row][column - 1].meta_data,
+                   4)) // 4th bit Cell to the Left
+        SETBIT(arr[row][column].meta_data, 3);
+    }
+
+    if (row + 1 < size) {
+      if (BITVALUE(arr[row + 1][column].meta_data,
+                   4)) // 4th bit Cell below
+        SETBIT(arr[row][column].meta_data, 1);
+    }
+  }
+
+  // lower right corner at index[size - 1][size - 1]
+  // not available Cells down & right
+  else if (row == size - 1 && column == size - 1) {
+    if (column - 1 >= 0) {
+      if (BITVALUE(arr[row][column - 1].meta_data,
+                   4)) // 4th bit Cell to the right
+        SETBIT(arr[row][column].meta_data, 0);
+    }
+
+    if (row - 1 >= 0) {
+      if (BITVALUE(arr[row - 1][column].meta_data,
+                   4)) // 4th bit Cell above
+        SETBIT(arr[row][column].meta_data, 2);
+    }
+  }
+
+  /* edge case */
+  // top edge
+  else if (row == 0) {
+    if (BITVALUE(arr[row][column - 1].meta_data,
+                 4)) // 4th bit Cell to the Left
+      SETBIT(arr[row][column].meta_data, 3);
+
+    if (BITVALUE(arr[row][column - 1].meta_data,
+                 4)) // 4th bit Cell to the right
+      SETBIT(arr[row][column].meta_data, 0);
+
+    if (row + 1 < size) {
+      if (BITVALUE(arr[row + 1][column].meta_data,
+                   4)) // 4th bit Cell below
+        SETBIT(arr[row][column].meta_data, 1);
+    }
+  }
+  // left edge
+  else if (column == 0) {
+    if (BITVALUE(arr[row - 1][column].meta_data,
+                 4)) // 4th bit Cell above
+      SETBIT(arr[row][column].meta_data, 2);
+    if (BITVALUE(arr[row + 1][column].meta_data,
+                 4)) // 4th bit Cell below
+      SETBIT(arr[row][column].meta_data, 1);
+
+    if (column + 1 < size) {
+      if (BITVALUE(arr[row][column + 1].meta_data,
+                   4)) // 4th bit of Cell to the right
+        SETBIT(arr[row][column].meta_data, 0);
+    }
+  }
+
+  // bottom edge
+  else if (row == (size - 1)) {
+    if (BITVALUE(arr[row][column - 1].meta_data,
+                 4)) // 4th bit Cell to the Left
+      SETBIT(arr[row][column].meta_data, 3);
+
+    if (BITVALUE(arr[row][column - 1].meta_data,
+                 4)) // 4th bit Cell to the right
+      SETBIT(arr[row][column].meta_data, 0);
+
+    if (row - 1 >= 0) {
+      if (BITVALUE(arr[row - 1][column].meta_data,
+                   4)) // 4th bit Cell above
+        SETBIT(arr[row][column].meta_data, 2);
+    }
+  }
+
+  // right edge
+  else if (column == (size - 1)) {
+    if (BITVALUE(arr[row - 1][column].meta_data,
+                 4)) // 4th bit Cell above
+      SETBIT(arr[row][column].meta_data, 2);
+    if (BITVALUE(arr[row + 1][column].meta_data,
+                 4)) // 4th bit Cell below
+      SETBIT(arr[row][column].meta_data, 1);
+
+    if (column - 1 >= 0) {
+      if (BITVALUE(arr[row][column - 1].meta_data,
+                   4)) // 4th bit Cell to the Left
+        SETBIT(arr[row][column].meta_data, 3);
+    }
+  }
+
+  /* Normal case or cell with possible connections*/
+  else {
+    if (BITVALUE(arr[row][column - 1].meta_data,
+                 4)) // 4th bit Cell to the Left
+      SETBIT(arr[row][column].meta_data, 3);
+
+    if (BITVALUE(arr[row][column - 1].meta_data,
+                 4)) // 4th bit Cell to the right
+      SETBIT(arr[row][column].meta_data, 0);
+    if (BITVALUE(arr[row - 1][column].meta_data,
+                 4)) // 4th bit Cell above
+      SETBIT(arr[row][column].meta_data, 2);
+    if (BITVALUE(arr[row + 1][column].meta_data,
+                 4)) // 4th bit Cell below
+      SETBIT(arr[row][column].meta_data, 1);
   }
 }
