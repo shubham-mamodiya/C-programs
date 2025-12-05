@@ -2,27 +2,29 @@
 #include <stdio.h>
 
 int main() {
-  int i = 10;
-  unsigned int ui = 20;
-  short s = -5;
-  unsigned short us = 500;
-  long l = 100000L;
-  unsigned long ul = 4000000000UL;
-  long long ll = -900000000000LL;
-  unsigned long long ull = 18000000000000000000ULL;
+  /* ===== Integers assigned literal max values ===== */
+  int i = 2147483647;                        // max int
+  unsigned int ui = 4294967295U;             // max unsigned int
+  short s = 32767;                           // max short
+  unsigned short us = 65535U;                // max unsigned short
+  long l = 9223372036854775807L;             // max long (on 64-bit)
+  unsigned long ul = 18446744073709551615UL; // max unsigned long
+  long long ll = 9223372036854775807LL;      // max long long
+  unsigned long long ull = 18446744073709551615ULL;
 
-  char ch = 'A';
-  unsigned char uch = 250;
-  char str[] = "Hello";
+  /* ===== Chars ===== */
+  char ch = 127; // max signed char
+  unsigned char uch = 255;
 
-  float f = 3.14f;
-  double d = 9.876543;
-  long double ld = 15.123456789L;
+  /* ===== Floating types (approx literal) ===== */
+  float f = 3.402823466e+38F;
+  double d = 1.7976931348623157e+308;
+  long double ld = 1.189731495357231765e+4932L; // platform dependent
 
-  size_t size = 42;
+  size_t size = 18446744073709551615ULL; // on 64-bit usually equal to ULL max
   void *ptr = &i;
-
   printf("\n========== INTEGER ==========\n");
+
   printf("int               %%d  = %d\n", i);
   printf("unsigned int      %%u  = %u\n", ui);
   printf("short             %%hd = %hd\n", s);
