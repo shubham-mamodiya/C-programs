@@ -134,8 +134,26 @@ int get_Neighbors_State(int row, int column, int grid_size,
         next_column < grid_size) {
       if (BITVALUE(arr[next_row][next_column].meta_data, 4)) {
         SETBIT(arr[row][column].meta_data, idx);
+
+        // make connections
+        if (BITVALUE(arr[row][column].meta_data, 4)) {
+          if (arr[next_row][next_column].root.row < arr[row][column].root.row) {
+            arr[row][column].root = arr[next_row][next_column].root;
+            /* because we only gonna check if top row is connected to bottom row
+             * Each Cell will have a root to the cell that is on the top*/
+          } else {
+            arr[next_row][next_column].root = arr[row][column].root;
+          }
+          int temp_size =
+              arr[row][column].size + arr[next_row][next_column].size;
+          arr[row][column].size = temp_size;
+          arr[next_row][column].size = temp_size;
+        }
       }
     }
   }
   return 0;
 }
+
+/* I found a similar but better solution check percolation 2 in the same
+ * directory.*/
