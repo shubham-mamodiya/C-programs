@@ -53,6 +53,7 @@ int initialize(int grid_size) {
       grid[idx][jdx].number = index;
       grid[idx][jdx].size = 1;
       grid[idx][jdx].open = 0;
+      index++;
     }
   }
 
@@ -117,29 +118,70 @@ int connect_neighbors(int row, int col) {
       {1, 0}   // down
   };
 
+  int current_root = find_root(grid[row][col].number);
+  int current_root_row = row_index(current_root);
+  int current_root_col = col_index(current_root);
+  if (current_root == -1) {
+    printf("!Cell (row, col) is not on grid.");
+    return 9;
+  }
+  unsigned int current_root_size =
+      grid[current_root_row][current_root_col].size;
+
   for (int idx = 0; idx < 4; idx++) {
     int next_row = dir[idx][0] + row;
     int next_col = dir[idx][1] + col;
 
+    // only if neighboring Cell is on the grid
     if (next_row >= 0 && next_row < grid_size && next_col >= 0 &&
         next_col < grid_size) {
+      // only if neighboring Cell is open
       if (grid[next_row][next_col].open) {
+        // root of neighbor and it's index
+        int neighbor_root = find_root(grid[next_row][next_col].number);
+        int neighbor_root_row = row_index(neighbor_root);
+        int neighbor_root_col = col_index(neighbor_root);
+        unsigned int neighbor_root_size =
+            grid[neighbor_root_row][neighbor_root_col].size;
+
+        // connect small tree with bigger on
+        if (grid[row][col].size < grid[next_row][next_col].size) {
+          grid[row][col].number = neighbor_root;
+          grid[neighbor_root_row][neighbor_root_col].size += current_root_size;
+        } else {
+          grid[next_row][next_col].number = current_root;
+          grid[row][col].size += neighbor_root_size;
+        }
       }
     }
   }
   return 0;
 }
 
-int root(unsigned int current) {
-  if (current >= (grid_size * grid_size))
+// finds the root of root parameter and makes the tree flat
+// return -1 when root is Invalid
+int find_root(unsigned int root) {
+  if (root >= (grid_size * grid_size))
     return -1;
 
-  unsigned int row = row_index(current);
-  unsigned int col = col_index(current);
-  while (grid[row][col].number != current) {
+  unsigned int current = root;
+
+  // Finding the root
+  unsigned int row = row_index(root);
+  unsigned int col = col_index(root);
+  while (grid[row][col].number != root) {
+    root = grid[row][col].number;
+    row = row_index(root);
+    col = col_index(root);
+  }
+
+  // Flattening the tree and making each Cell to point to it's root
+  while (current != root) {
     current = grid[row][col].number;
+    grid[row][col].number = root;
     row = row_index(current);
     col = col_index(current);
   }
-  return current;
+
+  return root;
 }

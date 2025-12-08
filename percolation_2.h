@@ -12,6 +12,8 @@ typedef struct Cell {
 extern int grid_size;
 extern int iter;
 extern Cell (*grid)[0];
+extern Cell virtual_top;
+extern Cell virtual_bottom;
 
 #define row_index(x) (x / grid_size)
 #define col_index(x) (x % grid_size)
@@ -21,5 +23,7 @@ int open(size_t row, size_t col);
 int isOpen(size_t row, size_t col);
 int isFull(size_t row, size_t col);
 size_t numberofopensites();
+int connect_neighbors(int row, int col);
+int find_root(unsigned int root);
 
 #endif // !PERCOLATION_2
