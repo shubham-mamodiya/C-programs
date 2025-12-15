@@ -15,6 +15,14 @@ extern Cell (*grid)[0];
 extern Cell virtual_top;
 extern Cell virtual_bottom;
 
+/* This is just a claver trick, but not acceptable*/
+extern unsigned int top;
+extern int is_top; // First open Cell at the top and all open Cell in
+                   // first row are connected to it
+extern unsigned int bottom;
+extern int is_bottom; // First open Cell at the bottom row and all open
+                      // Cell in bottom row are connected to it
+
 #define row_index(x) (x / grid_size)
 #define col_index(x) (x % grid_size)
 
@@ -25,5 +33,6 @@ int isFull(size_t row, size_t col);
 size_t numberofopensites();
 int connect_neighbors(int row, int col);
 int find_root(unsigned int root);
+int connect_to_root(int row, int col, unsigned int root);
 
 #endif // !PERCOLATION_2

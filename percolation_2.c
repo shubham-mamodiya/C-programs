@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+int is_top = 0;
+int is_bottom = 0;
+
 int main(int argc, char *argv[]) {
 
   if (argc != 3) {
@@ -72,6 +75,40 @@ int open(size_t row, size_t col) {
     return 6;
   }
   grid[row][col].open = 1;
+
+  int status = 0; // storage for function return values
+
+  /* This part is just a trick to make it faster. but, it is not valid
+   * approach*/
+  if (row == 0) {
+    if (!is_top) {
+      top = grid[row][col].number;
+      is_top = 1;
+    } else {
+      status = connect_to_root(row, col, top);
+      if (status) {
+        return status;
+      }
+    }
+  }
+
+  if (row == (grid_size - 1)) {
+    if (!is_bottom) {
+      bottom = grid[row][col].number;
+      is_bottom = 1;
+    } else {
+      status = connect_to_root(row, col, bottom);
+      if (status) {
+        return status;
+      }
+    }
+  }
+  /* end */
+
+  status = connect_neighbors(row, col);
+  if (status) {
+    return status; // probably
+  }
   return 0;
 }
 
@@ -145,12 +182,15 @@ int connect_neighbors(int row, int col) {
             grid[neighbor_root_row][neighbor_root_col].size;
 
         // connect small tree with bigger on
-        if (grid[row][col].size < grid[next_row][next_col].size) {
-          grid[row][col].number = neighbor_root;
-          grid[neighbor_root_row][neighbor_root_col].size += current_root_size;
-        } else {
-          grid[next_row][next_col].number = current_root;
-          grid[row][col].size += neighbor_root_size;
+        if (current_root != neighbor_root) {
+          if (grid[row][col].size < grid[next_row][next_col].size) {
+            grid[row][col].number = neighbor_root;
+            grid[neighbor_root_row][neighbor_root_col].size +=
+                current_root_size;
+          } else {
+            grid[next_row][next_col].number = current_root;
+            grid[row][col].size += neighbor_root_size;
+          }
         }
       }
     }
@@ -184,4 +224,51 @@ int find_root(unsigned int root) {
   }
 
   return root;
+}
+
+// connect (row, col) to root (top or bottom)
+int connect_to_root(int row, int col, unsigned int root) {
+  if (row >= grid_size || row < 0) {
+    printf("!row index is Invalid %d >= %d or negative", row, grid_size);
+    return 10;
+  }
+  if (col >= grid_size || col < 0) {
+    printf("!col index is Invalid %d >= %d or negative", col, grid_size);
+    return 10;
+  }
+
+  int current_root = find_root(grid[row][col].number);
+  int current_root_row = row_index(current_root);
+  int current_root_col = col_index(current_root);
+  if (current_root == -1) {
+    printf("!Cell (row, col) is not on grid.");
+    return 11;
+  }
+  unsigned int current_root_size =
+      grid[current_root_row][current_root_col].size;
+
+  // indices for root
+  int root_row = row_index(root_row);
+  int root_col = col_index(root_col);
+  if (root_row >= grid_size || root_row < 0) {
+    printf("!row index is Invalid %d >= %d or negative", row, grid_size);
+    return 10;
+  }
+  if (root_col >= grid_size || root_col < 0) {
+    printf("!col index is Invalid %d >= %d or negative", col, grid_size);
+    return 10;
+  }
+
+  unsigned int root_size = grid[root_row][root_col].size;
+
+  // connect this Cell to the root
+  if (current_root != root) {
+
+    if (grid[row][col].size < grid[root_row][root_col].size) {
+      grid[row][col].number = root;
+      grid[root_row][root_col].size += current_root_size;
+    }
+  }
+
+  return 0;
 }
